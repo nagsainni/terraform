@@ -9,3 +9,6 @@ Sruthi variables{
     type = string
     default = sruthi
 }
+
+hi this is Sruthi 
+I am learning git
