@@ -1,0 +1,36 @@
+name: Create and Trigger Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      repository_name:
+        description: 'Name of the repository to create'
+        required: true
+        type: string
+      tech_stack:
+        description: 'Tech stack (e.g., node, python, java)'
+        required: true
+        type: string
+      manifest:
+        description: 'Manifest type (e.g., package.json, requirements.txt)'
+        required: true
+        type: string
+
+jobs:
+  create-repo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Create repository via GitHub CLI
+        run: |
+          gh auth login --with-token < ${{ secrets.GITHUB_TOKEN }}
+          gh repo create ${{ github.repository_owner }}/${{ inputs.repository_name }} --public --confirm
+
+      - name: Trigger tech-specific workflow
+        run: |
+          gh workflow run trigger-tech-workflow.yml \
+            --repo ${{ github.repository_owner }}/${{ inputs.repository_name }} \
+            --field tech_stack=${{ inputs.tech_stack }} \
+            --field manifest=${{ inputs.manifest }}
